@@ -410,34 +410,37 @@
             /* ── КНОПКИ: одна строка, нативный safe-area ── */
             #btn-group {
                 top:auto !important; right:auto !important;
-                /* max(72px,...) — гарантирует видимость над chrome любого браузера */
-                bottom:max(72px, calc(16px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px))) !important;
+                bottom:80px !important;
+                bottom:calc(80px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px)) !important;
                 left:50% !important;
                 transform:translateX(-50%) !important;
                 flex-direction:row !important;
                 flex-wrap:nowrap !important;
                 justify-content:center !important;
-                gap:5px !important;
+                gap:4px !important;
                 align-items:center !important;
                 width:calc(100vw - 16px) !important;
                 z-index:5001 !important;
             }
             .top-btn {
-                padding:5px 8px !important;
+                padding:4px 7px !important;
                 font-size:9px !important;
+                gap:4px !important;
                 letter-spacing:0 !important;
                 white-space:nowrap !important;
                 max-width:none !important;
                 overflow:visible !important;
                 flex-shrink:1 !important;
             }
+            /* цветные точки на мобилке занимают место — скрыть */
+            .bp-dot, .bt-dot, .bfaq-dot { display:none !important; }
 
             /* Легенда и подсказки: скрыть — экономим место */
             #legend { display:none !important; }
             #hint   { display:none !important; }
 
             /* Tap-hint: выше кнопок */
-            #tap-hint { bottom:max(116px, calc(80px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px))) !important; font-size:11px !important; padding:8px 16px !important; }
+            #tap-hint { bottom:calc(122px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px)) !important; font-size:11px !important; padding:8px 16px !important; }
 
             /* ── ПАНЕЛИ ── */
             .tp-inner, .ep-inner, .hp-inner, .pp-inner { padding:14px 14px 64px !important; }
@@ -7916,7 +7919,7 @@ function resizeCanvas() {
 function computeLayout() {
     const safeB = W < 600 ? (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom')) || 0) : 0;
     const topUi = W < 600 ? 58 : 0;
-    const botUi = W < 600 ? (52 + safeB) : 0;
+    const botUi = W < 600 ? Math.max(140, 52 + safeB) : 0;
     CY  = topUi + (H - topUi - botUi) / 2;
     AMP = W < 600
         ? Math.min((H - topUi - botUi) * 0.38, 220)
