@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AI-карта бизнеса</title>
     <style>
         *, *::before, *::after { margin:0 !important; padding:0 !important; box-sizing:border-box !important; }
@@ -403,10 +403,10 @@
             }
             #search-bar:focus-within { width:auto !important; }
 
-            /* ── КНОПКИ: одна строка, под браузерным баром ── */
+            /* ── КНОПКИ: одна строка, нативный safe-area ── */
             #btn-group {
                 top:auto !important; right:auto !important;
-                bottom:90px !important;
+                bottom:calc(16px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px)) !important;
                 left:50% !important;
                 transform:translateX(-50%) !important;
                 flex-direction:row !important;
@@ -431,7 +431,7 @@
             #hint   { display:none !important; }
 
             /* Tap-hint: выше кнопок */
-            #tap-hint { bottom:130px !important; font-size:11px !important; padding:8px 16px !important; }
+            #tap-hint { bottom:calc(80px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px)) !important; font-size:11px !important; padding:8px 16px !important; }
 
             /* ── ПАНЕЛИ ── */
             .tp-inner, .ep-inner, .hp-inner, .pp-inner { padding:14px 14px 64px !important; }
@@ -7907,8 +7907,9 @@ function resizeCanvas() {
 }
 
 function computeLayout() {
+    const safeB = W < 600 ? (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom')) || 0) : 0;
     const topUi = W < 600 ? 58 : 0;
-    const botUi = W < 600 ? 110 : 0;
+    const botUi = W < 600 ? (52 + safeB) : 0;
     CY  = topUi + (H - topUi - botUi) / 2;
     AMP = Math.min((H - topUi - botUi) * 0.26, 200);
     T   = (X1-X0)/TURNS;
@@ -8067,6 +8068,23 @@ function render() {
 
 window.addEventListener('load', function() {
     resizeCanvas();
+
+    // ── Safe area: определяем высоту нижнего chrome браузера ──────
+    function applySafeArea() {
+        const vv = window.visualViewport;
+        if (!vv) return;
+        if (vv.height < window.innerHeight * 0.75) return; // клавиатура — пропускаем
+        const inset = Math.max(0, window.innerHeight - vv.height);
+        document.documentElement.style.setProperty('--safe-bottom', inset + 'px');
+    }
+    applySafeArea();
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', function() {
+            applySafeArea();
+            if (W < 600) computeLayout();
+        });
+    }
+
     computeLayout();
     const fitZoom = Math.min(0.95, (W - 80) / (WORLD_W * 0.70));
     zoom = targetZoom = W < 600 ? 0.30 : (W < 700 ? Math.min(0.30, fitZoom) : fitZoom);
