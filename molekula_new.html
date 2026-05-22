@@ -339,6 +339,7 @@
         .ob-hook { font-size:18px !important; font-weight:800 !important; color:#fff !important; line-height:1.3 !important; margin-bottom:14px !important; }
         .ob-hook.teal { color:#00c9a7 !important; }
         .ob-p { font-size:13.5px !important; color:rgba(255,255,255,0.62) !important; line-height:1.6 !important; margin-bottom:11px !important; }
+        .ob-quote { padding-left:12px !important; border-left:2px solid #00c9a7 !important; font-style:italic !important; font-size:13.5px !important; color:rgba(255,255,255,0.78) !important; line-height:1.6 !important; }
         .ob-dots { text-align:center !important; color:rgba(255,255,255,0.3) !important; letter-spacing:5px !important; font-size:12px !important; margin:16px 0 6px !important; }
         .ob-chips { display:flex !important; flex-wrap:wrap !important; gap:7px !important; margin-top:14px !important; }
         .ob-chip { background:rgba(255,255,255,0.05) !important; border:1px solid rgba(255,255,255,0.1) !important; border-radius:20px !important; padding:6px 13px !important; font-size:12px !important; color:rgba(255,255,255,0.6) !important; cursor:pointer !important; }
@@ -7890,6 +7891,7 @@ const TURNS = 4;
 let W = 300, H = 300;
 let CY, AMP, T;
 let zoom = 1, targetZoom = 1, zoomFocusX = 0, panX = 0, targetPanX = null, rot = 0, active = null;
+let rotPaused = false;
 
 const nMap = {};
 ND.forEach(n => nMap[n.id] = n);
@@ -7911,7 +7913,9 @@ function computeLayout() {
     const topUi = W < 600 ? 58 : 0;
     const botUi = W < 600 ? (52 + safeB) : 0;
     CY  = topUi + (H - topUi - botUi) / 2;
-    AMP = Math.min((H - topUi - botUi) * 0.26, 200);
+    AMP = W < 600
+        ? Math.min((H - topUi - botUi) * 0.38, 220)
+        : Math.min(H * 0.26, 200);
     T   = (X1-X0)/TURNS;
     const N = ND.length;
     ND.forEach((n, i) => { n.hx = X0 + i/(N-1)*(X1-X0); n.onA = (i%2===0); });
@@ -8113,7 +8117,7 @@ window.addEventListener('load', function() {
             else { panX += diff * 0.1; }
         }
     }
-    function loop() { rot+=0.004; updateCamera(); render(); requestAnimationFrame(loop); }
+    function loop() { if (!rotPaused) rot += 0.004; updateCamera(); render(); requestAnimationFrame(loop); }
     loop();
 });
 
@@ -8177,6 +8181,21 @@ function showTapHint(node) {
 
     // Anchor = bottom-center of popup for the connection line
     nodePopupAnchor = { x: W / 2, y: 68 + 162 };
+
+    // ── Mobile autopan: bring node to upper area, popup below it ────
+    if (W < 600) {
+        rotPaused = true;
+        // Pan node to horizontal center of screen
+        targetPanX = (W * 0.5 - W * (1 - zoom) / 2) / zoom - node.hx;
+        // Position popup below the node (node is active → rendered at baseR * 1.25)
+        const depth = (node.hz + 1) / 2;
+        const drawR = node.r * (0.55 + 0.55 * depth) * zoom * 1.25;
+        const scyNow = sy(node.hy);
+        const rawTop = scyNow + drawR + 14;
+        const popupTop = Math.max(70, Math.min(H * 0.55, rawTop));
+        nodePopup.style.setProperty('top', popupTop + 'px', 'important');
+        nodePopupAnchor = { x: W / 2, y: popupTop + 162 };
+    }
 }
 function hideTapHint() {
     tapHint.classList.remove('show');
@@ -8184,6 +8203,8 @@ function hideTapHint() {
     nodePopupAnchor = null;
     searchWrap.style.borderColor = '';
     searchWrap.style.boxShadow   = '';
+    rotPaused = false;
+    nodePopup.style.removeProperty('top');
 }
 
 canvas.addEventListener("mousedown", e=>{ mdX=e.clientX; mdPanX=panX; dragging=true; canvas.style.cursor="grabbing"; });
@@ -8220,7 +8241,7 @@ canvas.addEventListener("touchmove", e => {
         const newZoom = Math.max(0.1, Math.min(4, pinchZ0 * touchDist(e) / pinchD0));
         // удерживаем мировую точку под серединой пальцев
         panX = (pinchMidX - W*(1-newZoom)/2) / newZoom - pinchWorldX;
-        zoom = newZoom;
+        zoom = targetZoom = newZoom; // оба значения — иначе анимация откатывала zoom назад
     } else {
         panX = tp0 + (e.touches[0].clientX - tx0) / zoom;
     }
@@ -8304,6 +8325,8 @@ function openPhasePanel(phaseNode) {
 
     canvas.classList.add('dim');
     hideUI();
+    rotPaused = false;
+    nodePopup.style.removeProperty('top');
     topicPanel.classList.add('active'); topicPanel.scrollTop = 0;
     if(window.OB) OB.showNode();
 }
@@ -9019,9 +9042,9 @@ restoreNavState();
   /* ---- Попап 1: приветствие, 2 шага ---- */
   var welcomeSteps=[
     ['Вокруг искусственного интеллекта столько шума. Не у каждого есть время освоить ИИ как новую профессию, но каждый ищет инструменты, которые действительно работают и помогают бизнесу снижать потери и быстрее создавать результат. Сейчас, в 2026, это особенно важно.',
-     'Мы собрали карту бизнеса из 12 направлений. В каждом — ключевые темы, актуальные задачи и готовые AI-инструменты в формате «бери и делай»: проверить договор, найти где утекает прибыль, проанализировать конкурентов, нанять человека, посчитать юнит-экономику, провести стратсессию и многое другое.'],
+     '<div class="ob-quote">Мы собрали карту бизнеса из 12 направлений. В каждом — ключевые темы, актуальные задачи и готовые AI-инструменты в формате «бери и делай»: проверить договор, найти где утекает прибыль, проанализировать конкурентов, нанять человека, посчитать юнит-экономику, провести стратсессию и многое другое.</div>'],
     ['Это не теория. В Fix Price робот-рекрутер отбирает каждого второго кандидата на линейные позиции. Банки закрывают чат-ботами с ИИ до 75% обращений в поддержку. Магнит планирует спрос и закупки на ИИ, сокращая потери от списаний на 15–20%. Пока одни компании спорят, работает это или нет, другие уже двигаются с другой скоростью.',
-     'Часть инструментов на карте работает прямо сейчас, остальные мы строим вместе с пользователями. Откройте карту и начните с того, что нужно вашему бизнесу.']
+     'Часть инструментов на карте работает прямо сейчас, остальные мы строим вместе с пользователями. Откройте карту и начните с того, что нужно вашему бизнесу. Голосуйте за инструменты, которые хотите видеть на платформе.']
   ];
   OB.welcomeStep=function(n){
     OB.render({
