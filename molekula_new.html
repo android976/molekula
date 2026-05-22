@@ -391,29 +391,22 @@
         .tools-cta-btn.ghost:hover { background:rgba(0,201,167,0.12) !important; filter:none !important; }
         /* ── MOBILE (≤600px) ── */
         @media (max-width: 600px) {
-            /* ── ЗАГОЛОВОК: по центру сверху ── */
-            #ui-title {
-                top:14px !important; left:50% !important;
-                transform:translateX(-50%) !important;
-                text-align:center !important;
-                width:max-content !important;
-            }
-            #ui-title h1 { font-size:13px !important; white-space:nowrap !important; }
-            #ui-title p  { display:none !important; }
+            /* ── ЗАГОЛОВОК: скрыть — экономим место ── */
+            #ui-title { display:none !important; }
 
-            /* ── ПОИСК: под заголовком, во всю ширину ── */
+            /* ── ПОИСК: прижать к самому верху ── */
             #search-bar {
-                top:48px !important;
+                top:10px !important;
                 left:10px !important; right:10px !important;
                 width:auto !important;
                 transform:none !important;
             }
             #search-bar:focus-within { width:auto !important; }
 
-            /* ── КНОПКИ: внизу по центру, горизонтально ── */
+            /* ── КНОПКИ: внизу по центру, с запасом на браузерный бар ── */
             #btn-group {
                 top:auto !important; right:auto !important;
-                bottom:12px !important;
+                bottom:72px !important;
                 left:50% !important;
                 transform:translateX(-50%) !important;
                 flex-direction:row !important;
@@ -432,14 +425,12 @@
                 overflow:visible !important;
             }
 
-            /* Легенда: выше кнопок */
-            #legend { bottom:80px !important; left:10px !important; padding:5px 9px !important; }
-
-            /* Подсказка: скрыть — кнопки заняли низ */
-            #hint { display:none !important; }
+            /* Легенда и подсказки: скрыть — экономим место */
+            #legend { display:none !important; }
+            #hint   { display:none !important; }
 
             /* Tap-hint: выше кнопок */
-            #tap-hint { bottom:82px !important; font-size:11px !important; padding:8px 16px !important; }
+            #tap-hint { bottom:130px !important; font-size:11px !important; padding:8px 16px !important; }
 
             /* ── ПАНЕЛИ ── */
             .tp-inner, .ep-inner, .hp-inner, .pp-inner { padding:14px 14px 64px !important; }
