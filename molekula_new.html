@@ -416,6 +416,7 @@
                 gap:5px !important;
                 align-items:center !important;
                 width:calc(100vw - 16px) !important;
+                z-index:5001 !important;
             }
             .top-btn {
                 padding:5px 8px !important;
@@ -8207,7 +8208,8 @@ function hideTapHint() {
     nodePopup.style.removeProperty('top');
 }
 
-canvas.addEventListener("mousedown", e=>{ mdX=e.clientX; mdPanX=panX; dragging=true; canvas.style.cursor="grabbing"; });
+let lastTouchTime = 0;
+canvas.addEventListener("mousedown", e=>{ if(Date.now()-lastTouchTime<600) return; mdX=e.clientX; mdPanX=panX; dragging=true; canvas.style.cursor="grabbing"; });
 window.addEventListener("mousemove", e=>{ if(!dragging) return; if(Math.abs(e.clientX-mdX)>3) panX=mdPanX+(e.clientX-mdX)/zoom; });
 window.addEventListener("mouseup", e=>{
     if(!dragging) return; dragging=false; canvas.style.cursor="default";
@@ -8248,6 +8250,7 @@ canvas.addEventListener("touchmove", e => {
 }, {passive:false});
 
 canvas.addEventListener("touchend",e=>{
+    lastTouchTime = Date.now();
     const dx=Math.abs(e.changedTouches[0].clientX-tx0);
     if(e.changedTouches.length===1&&dx<8){
         const t=e.changedTouches[0], n=hitTest(t.clientX,t.clientY);
