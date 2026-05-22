@@ -389,6 +389,65 @@
         .tools-cta-btns { display:flex !important; gap:10px !important; flex-wrap:wrap !important; }
         .tools-cta-btn.ghost { background:transparent !important; color:#00c9a7 !important; border:1px solid rgba(0,201,167,0.5) !important; }
         .tools-cta-btn.ghost:hover { background:rgba(0,201,167,0.12) !important; filter:none !important; }
+        /* ── MOBILE (≤600px) ── */
+        @media (max-width: 600px) {
+            /* Заголовок: компактный */
+            #ui-title { top:10px !important; left:10px !important; }
+            #ui-title h1 { font-size:12px !important; }
+            #ui-title p  { display:none !important; }
+
+            /* Поиск: уже по ширине, остаётся по центру */
+            #search-bar { width:clamp(130px,38vw,200px) !important; top:10px !important; }
+            #search-bar:focus-within { width:clamp(180px,70vw,320px) !important; }
+
+            /* Кнопки: вертикальная колонка справа */
+            #btn-group {
+                top:8px !important; right:6px !important;
+                flex-direction:column !important;
+                gap:4px !important;
+                align-items:flex-end !important;
+            }
+            .top-btn {
+                padding:5px 9px !important;
+                font-size:9px !important;
+                letter-spacing:0 !important;
+                max-width:110px !important;
+                overflow:hidden !important;
+                text-overflow:ellipsis !important;
+                white-space:nowrap !important;
+            }
+
+            /* Подсказка и легенда */
+            #hint { font-size:10px !important; right:10px !important; bottom:14px !important; line-height:1.5 !important; }
+            #legend { left:10px !important; bottom:12px !important; padding:5px 9px !important; }
+            #tap-hint { font-size:11px !important; padding:8px 16px !important; bottom:14px !important; }
+
+            /* ── ПАНЕЛИ ── */
+            .tp-inner, .ep-inner, .hp-inner, .pp-inner { padding:14px 14px 64px !important; }
+            .sc-hero       { padding:20px 14px 24px !important; }
+            .sc-steps-wrap { padding:24px 14px 64px !important; }
+
+            #tp-name       { font-size:24px !important; letter-spacing:-0.5px !important; }
+            #ep-name       { font-size:26px !important; letter-spacing:-0.8px !important; }
+            .hp-name       { font-size:22px !important; }
+            .pp-title      { font-size:24px !important; }
+            .sc-hero-title { font-size:24px !important; }
+
+            /* Сетки: 1 колонка для ролей и инструментов, 2 для шапок */
+            .role-grid { grid-template-columns:1fr !important; }
+            .hat-grid  { grid-template-columns:repeat(2,1fr) !important; }
+            .tool-grid { grid-template-columns:1fr !important; }
+
+            .sf-label { min-width:72px !important; }
+
+            /* AI-карточка: bottom sheet снизу */
+            #ai-card { padding:0 !important; align-items:flex-end !important; }
+            .aic-box { border-radius:20px 20px 0 0 !important; max-height:92vh !important; }
+            .aic-sections  { padding:0 16px !important; }
+            .aic-top       { padding:20px 16px 0 !important; }
+            .aic-tool-line { padding:12px 16px !important; }
+            .aic-actions   { padding:16px 0 0 !important; }
+        }
     </style>
 </head>
 <body>
@@ -7827,10 +7886,14 @@ ND.forEach(n => nMap[n.id] = n);
 const LINKS = LR.map(([a,b]) => ({ s:nMap[a], t:nMap[b] }));
 
 function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
     W = window.innerWidth  || document.documentElement.clientWidth  || 300;
     H = window.innerHeight || document.documentElement.clientHeight || 300;
-    canvas.width  = W;
-    canvas.height = H;
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function computeLayout() {
@@ -7992,7 +8055,7 @@ window.addEventListener('load', function() {
     resizeCanvas();
     computeLayout();
     const fitZoom = Math.min(0.95, (W - 80) / (WORLD_W * 0.70));
-    zoom = targetZoom = W < 700 ? Math.min(0.30, fitZoom) : fitZoom;
+    zoom = targetZoom = W < 600 ? 0.30 : (W < 700 ? Math.min(0.30, fitZoom) : fitZoom);
     panX = -(WORLD_W/2 - W/2);
 
     const bar=document.getElementById("phase-bar");
