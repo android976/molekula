@@ -8081,14 +8081,15 @@ window.addEventListener('load', function() {
         if (vv.height < window.innerHeight * 0.75) return; // клавиатура — пропускаем
         const inset = Math.max(0, window.innerHeight - vv.height);
         document.documentElement.style.setProperty('--safe-bottom', inset + 'px');
+        if (W < 600) computeLayout();
     }
     applySafeArea();
+    setTimeout(applySafeArea, 400); // Яндекс-браузер рисует chrome после load
+    setTimeout(applySafeArea, 1200);
     if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', function() {
-            applySafeArea();
-            if (W < 600) computeLayout();
-        });
+        window.visualViewport.addEventListener('resize', applySafeArea);
     }
+    window.addEventListener('resize', applySafeArea);
 
     computeLayout();
     const fitZoom = Math.min(0.95, (W - 80) / (WORLD_W * 0.70));
@@ -8183,19 +8184,10 @@ function showTapHint(node) {
     // Anchor = bottom-center of popup for the connection line
     nodePopupAnchor = { x: W / 2, y: 68 + 162 };
 
-    // ── Mobile autopan: bring node to upper area, popup below it ────
+    // ── Mobile autopan: pause rotation, center node horizontally ────
     if (W < 600) {
         rotPaused = true;
-        // Pan node to horizontal center of screen
         targetPanX = (W * 0.5 - W * (1 - zoom) / 2) / zoom - node.hx;
-        // Position popup below the node (node is active → rendered at baseR * 1.25)
-        const depth = (node.hz + 1) / 2;
-        const drawR = node.r * (0.55 + 0.55 * depth) * zoom * 1.25;
-        const scyNow = sy(node.hy);
-        const rawTop = scyNow + drawR + 14;
-        const popupTop = Math.max(70, Math.min(H * 0.55, rawTop));
-        nodePopup.style.setProperty('top', popupTop + 'px', 'important');
-        nodePopupAnchor = { x: W / 2, y: popupTop + 162 };
     }
 }
 function hideTapHint() {
@@ -8205,7 +8197,6 @@ function hideTapHint() {
     searchWrap.style.borderColor = '';
     searchWrap.style.boxShadow   = '';
     rotPaused = false;
-    nodePopup.style.removeProperty('top');
 }
 
 let lastTouchTime = 0;
@@ -8329,7 +8320,6 @@ function openPhasePanel(phaseNode) {
     canvas.classList.add('dim');
     hideUI();
     rotPaused = false;
-    nodePopup.style.removeProperty('top');
     topicPanel.classList.add('active'); topicPanel.scrollTop = 0;
     if(window.OB) OB.showNode();
 }
