@@ -403,26 +403,27 @@
             }
             #search-bar:focus-within { width:auto !important; }
 
-            /* ── КНОПКИ: внизу по центру, с запасом на браузерный бар ── */
+            /* ── КНОПКИ: одна строка, под браузерным баром ── */
             #btn-group {
                 top:auto !important; right:auto !important;
-                bottom:72px !important;
+                bottom:90px !important;
                 left:50% !important;
                 transform:translateX(-50%) !important;
                 flex-direction:row !important;
-                flex-wrap:wrap !important;
+                flex-wrap:nowrap !important;
                 justify-content:center !important;
-                gap:6px !important;
+                gap:5px !important;
                 align-items:center !important;
-                width:calc(100vw - 20px) !important;
+                width:calc(100vw - 16px) !important;
             }
             .top-btn {
-                padding:6px 12px !important;
-                font-size:10px !important;
+                padding:5px 8px !important;
+                font-size:9px !important;
                 letter-spacing:0 !important;
                 white-space:nowrap !important;
                 max-width:none !important;
                 overflow:visible !important;
+                flex-shrink:1 !important;
             }
 
             /* Легенда и подсказки: скрыть — экономим место */
@@ -7906,7 +7907,11 @@ function resizeCanvas() {
 }
 
 function computeLayout() {
-    CY = H / 2; AMP = Math.min(H * 0.26, 200); T = (X1-X0)/TURNS;
+    const topUi = W < 600 ? 58 : 0;
+    const botUi = W < 600 ? 110 : 0;
+    CY  = topUi + (H - topUi - botUi) / 2;
+    AMP = Math.min((H - topUi - botUi) * 0.26, 200);
+    T   = (X1-X0)/TURNS;
     const N = ND.length;
     ND.forEach((n, i) => { n.hx = X0 + i/(N-1)*(X1-X0); n.onA = (i%2===0); });
     ND.forEach(n => n.nb = []);
