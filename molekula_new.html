@@ -312,7 +312,10 @@
         }
         #node-popup.show { opacity:1 !important; transform:translateX(-50%) translateY(0) scale(1) !important; }
         @media (max-width:600px) {
-            #node-popup { width:clamp(220px,26vw,340px) !important; }
+            #node-popup {
+                width:min(calc(100vw - 32px), 340px) !important;
+                top:58px !important;
+            }
         }
         .np-bar  { height:3px !important; width:100% !important; flex-shrink:0 !important; }
         .np-inner { padding:13px 15px 11px !important; }
@@ -407,7 +410,8 @@
             /* ── КНОПКИ: одна строка, нативный safe-area ── */
             #btn-group {
                 top:auto !important; right:auto !important;
-                bottom:calc(16px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px)) !important;
+                /* max(72px,...) — гарантирует видимость над chrome любого браузера */
+                bottom:max(72px, calc(16px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px))) !important;
                 left:50% !important;
                 transform:translateX(-50%) !important;
                 flex-direction:row !important;
@@ -433,7 +437,7 @@
             #hint   { display:none !important; }
 
             /* Tap-hint: выше кнопок */
-            #tap-hint { bottom:calc(80px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px)) !important; font-size:11px !important; padding:8px 16px !important; }
+            #tap-hint { bottom:max(116px, calc(80px + var(--safe-bottom, 0px) + env(safe-area-inset-bottom, 0px))) !important; font-size:11px !important; padding:8px 16px !important; }
 
             /* ── ПАНЕЛИ ── */
             .tp-inner, .ep-inner, .hp-inner, .pp-inner { padding:14px 14px 64px !important; }
