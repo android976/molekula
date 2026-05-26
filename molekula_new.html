@@ -372,7 +372,7 @@
         .ob-faq-q { padding:12px 14px !important; font-size:13px !important; font-weight:600 !important; color:#fff !important; cursor:pointer !important; display:flex !important; justify-content:space-between !important; gap:10px !important; }
         .ob-faq-q:hover { color:#00c9a7 !important; }
         .ob-faq-q span { color:rgba(255,255,255,0.34) !important; flex-shrink:0 !important; }
-        .ob-faq-a { display:none !important; padding:0 14px 13px !important; font-size:13px !important; color:rgba(255,255,255,0.6) !important; line-height:1.6 !important; }
+        .ob-faq-a { display:none; padding:0 14px 13px !important; font-size:13px !important; color:rgba(255,255,255,0.6) !important; line-height:1.6 !important; }
         .ob-chip.sel { background:rgba(0,201,167,0.16) !important; border-color:#00c9a7 !important; color:#00c9a7 !important; }
         .ob-rg-h { font-size:19px !important; font-weight:800 !important; color:#fff !important; margin-bottom:6px !important; }
         .ob-rg-h span { color:#00c9a7 !important; }
@@ -8343,7 +8343,7 @@ function closePhasePanel() {
     showUI();
     active = null;
     clearNavState();
-    if(window.OB) OB.showFAQ();
+    if(window.OB && !OB.seen('exit')){ OB.markSeen('exit'); OB.showFAQ(); }
 }
 
 // ── Navigation state persistence (localStorage) ──────────────────
